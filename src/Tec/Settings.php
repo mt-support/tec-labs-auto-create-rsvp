@@ -2,11 +2,11 @@
 /**
  * Settings Object.
  *
- * @since __TRIBE_VERSION__
+ * @since 1.0.0
  *
- * @package Tribe\Extensions\__TRIBE_NAMESPACE__
+ * @package Tribe\Extensions\Autocreate_RSVP
  */
-namespace Tribe\Extensions\__TRIBE_NAMESPACE__;
+namespace Tribe\Extensions\Autocreate_RSVP;
 
 use Tribe__Settings_Manager;
 
