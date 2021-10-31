@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name:       Event Tickets Extension: Auto-create RSVP
- * Plugin URI:        
+ * Plugin URI:        https://theeventscalendar.com/extensions/auto-create-rsvp/
  * GitHub Plugin URI: https://github.com/mt-support/tec-labs-auto-create-rsvp
- * Description:       
+ * Description:       Automatically add an RSVP to an event when it is created.
  * Version:           1.0.0
  * Author:            The Events Calendar
  * Author URI:        https://evnt.is/1971
  * License:           GPL version 3 or any later version
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain:       __TRIBE_DOMAIN__
+ * Text Domain:       tec-labs-auto-create-rsvp
  *
  *     This plugin is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ function tribe_extension_auto_create_rsvp() {
 	if ( ! class_exists( '\Tribe\Extensions\Autocreate_RSVP\Plugin' ) ) {
 		tribe_transient_notice(
 			'auto-create-rsvp',
-			'<p>' . esc_html__( 'Couldn\'t properly load "Event Tickets Extension: Auto-create RSVP" the extension was deactivated.', '__TRIBE_DOMAIN__' ) . '</p>',
+			'<p>' . esc_html__( 'Couldn\'t properly load "Event Tickets Extension: Auto-create RSVP" the extension was deactivated.', 'tec-labs-auto-create-rsvp' ) . '</p>',
 			[],
 			// 1 second after that make sure the transient is removed.
 			1
