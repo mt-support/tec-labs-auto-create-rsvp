@@ -253,7 +253,7 @@ class Settings {
 				'type'            => 'html',
 				'html'            => '<p>' . esc_html__( 'You can define the values for the automatically created RSVP here.', 'tec-labs-auto-create-rsvp') . '</p>',
 			],
-			'acr-rsvp-title' => [
+			'acr-rsvp-name' => [
 				'type'            => 'text',
 				'label'           => esc_html__( 'RSVP name', 'tec-labs-auto-create-rsvp' ),
 				'tooltip'         => esc_html__( 'This is the name of your RSVP. It is displayed on the frontend of your website and within RSVP emails. If left empty "RSVP" will be used. You can use the following placeholders:', 'tec-labs-auto-create-rsvp' ),
@@ -341,6 +341,7 @@ class Settings {
 	private function get_event_categories() {
 		$args = [
 			'taxonomy' => 'tribe_events_cat',
+			'hide_empty' => false,
 			'orderby' => 'name',
 			'order' => 'ASC',
 		];
