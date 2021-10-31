@@ -45,9 +45,6 @@ class Settings {
 
 		$this->set_options_prefix( $options_prefix );
 
-		// Remove settings specific to Google Maps
-		add_action( 'admin_init', [ $this, 'remove_settings' ] );
-
 		// Add settings specific to OSM
 		add_action( 'admin_init', [ $this, 'add_settings' ] );
 	}
@@ -205,48 +202,100 @@ class Settings {
 	}
 
 	/**
-	 * Here is an example of removing settings from Events > Settings > General tab > "Map Settings" section
-	 * that are specific to Google Maps.
-	 *
-	 * TODO: Remove this method and the corresponding hook in `__construct()` if you don't want to remove any settings.
-	 */
-	public function remove_settings() {
-		// Remove "Enable Google Maps" checkbox
-		$this->settings_helper->remove_field( 'embedGoogleMaps', 'general' );
-
-		// Remove "Map view search distance limit" (default of 25)
-		$this->settings_helper->remove_field( 'geoloc_default_geofence', 'general' );
-
-		// Remove "Google Maps default zoom level" (0-21, default of 10)
-		$this->settings_helper->remove_field( 'embedGoogleMapsZoom', 'general' );
-	}
-
-	/**
 	 * Adds a new section of fields to Events > Settings > General tab, appearing after the "Map Settings" section
 	 * and before the "Miscellaneous Settings" section.
 	 *
 	 * TODO: Move the setting to where you want and update this docblock. If you like it here, just delete this TODO.
 	 */
 	public function add_settings() {
+		$event_categories = $this->get_event_categories();
+
 		$fields = [
 			// TODO: Settings heading start. Remove this element if not needed. Also remove the corresponding `get_example_intro_text()` method below.
-			'Example'   => [
+			'acr-heading'   => [
 				'type' => 'html',
 				'html' => $this->get_example_intro_text(),
 			],
 			// TODO: Settings heading end.
-			'a_setting' => [ // TODO: Change setting.
-				'type'            => 'text',
-				'label'           => esc_html__( 'Example setting', 'tec-labs-auto-create-rsvp' ),
-				'tooltip'         => sprintf( esc_html__( 'Example setting description. Enter your custom URL, including "http://" or "https://", for example %s.', 'tec-labs-auto-create-rsvp' ), '<code>https://demo.theeventscalendar.com/</code>' ),
-				'validation_type' => 'html',
+			'acr-enable' => [ // TODO: Change setting.
+				'type'            => 'checkbox_bool',
+				'label'           => esc_html__( 'Enable', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'When enabled an RSVP will be automatically created for the event when the event is created.', 'tec-labs-auto-create-rsvp' ),
+				'validation_type' => 'boolean',
+				'default'         => false,
 			],
+			'acr-category'    => [
+				'type'            => 'dropdown',
+				'label'           => esc_html__( 'Limit to category', 'tec-labs-default-ticket-fieldset' ),
+				'tooltip'         => esc_html_x( 'You can limit adding the RSVP to events that are created in a certain category only.', 'Setting description', 'tec-labs-default-ticket-fieldset' ),
+				'validation_type' => 'options',
+				'options'         => $event_categories,
+			],
+			'acr-remove-category' => [
+				'type'            => 'checkbox_bool',
+				'label'           => esc_html__( 'Remove category after creation', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'By default the category is not removed from the event after it is created. With enabling this option the category will be removed from event.', 'tec-labs-auto-create-rsvp' ),
+				'validation_type' => 'boolean',
+				'default'         => false,
+			],
+			'acr-enable-on-update' => [
+				'type'            => 'checkbox_bool',
+				'label'           => esc_html__( 'Create an RSVP on Event Update', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'By default an RSVP is created only when a new event is created. With this option an RSVP will also be created when an event is updated.', 'tec-labs-auto-create-rsvp' ),
+				'validation_type' => 'boolean',
+				'default'         => false,
+			],
+			'acr-divider' => [
+				'type'            => 'html',
+				'html'            => '<hr>',
+			],
+			'acr-default-values-heading' => [
+				'type'            => 'html',
+				'html'            => '<p>' . esc_html__( 'You can define the values for the automatically created RSVP here.', 'tec-labs-auto-create-rsvp') . '</p>',
+			],
+			'acr-rsvp-title' => [
+				'type'            => 'text',
+				'label'           => esc_html__( 'RSVP name', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'This is the name of your RSVP. It is displayed on the frontend of your website and within RSVP emails. If left empty "RSVP" will be used. You can use the following placeholders:', 'tec-labs-auto-create-rsvp' ),
+				'validation_type' => 'html',
+				'size' => 'large',
+				'can_be_empty' => true,
+			],
+			'acr-rsvp-description' => [
+				'type'            => 'textarea',
+				'label'           => esc_html__( 'Description', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'This is the description of your RSVP.', 'tec-labs-auto-create-rsvp' ),
+				'validation_type' => 'textarea',
+			],
+			'acr-rsvp-show-descripition' => [
+				'type'            => 'checkbox_bool',
+				'label'           => esc_html__( 'Show description', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'Show description of frontend ticket form.', 'tec-labs-auto-create-rsvp' ),
+				'validation_type' => 'boolean',
+				'default'         => true,
+			],
+			'acr-rsvp-capacity' => [
+				'type'            => 'text',
+				'label'           => esc_html__( 'Capacity', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'Leave blank for unlimited', 'tec-labs-auto-create-rsvp' ),
+				'validation_type' => 'positive_int',
+				'size' => 'small',
+				'can_be_empty' => true,
+			],
+			'acr-rsvp-not-going' => [
+				'type'            => 'checkbox_bool',
+				'label'           => esc_html__( "Can't Go", 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'Enable "Can\'t Go" responses', 'tec-labs-auto-create-rsvp' ),
+				'validation_type' => 'boolean',
+				'default'         => false,
+			],
+
 		];
 
 		$this->settings_helper->add_fields(
 			$this->prefix_settings_field_keys( $fields ),
-			'general',
-			'tribeEventsMiscellaneousTitle',
+			'event-tickets',
+			'ticket-paypal-heading',
 			true
 		);
 	}
@@ -279,14 +328,31 @@ class Settings {
 	 * @return string
 	 */
 	private function get_example_intro_text() {
-		$result = '<h3>' . esc_html_x( 'Example Extension Setup', 'Settings header', 'tec-labs-auto-create-rsvp' ) . '</h3>';
+		$result = '<h3>' . esc_html_x( 'Auto-create RSVP', 'Settings header', 'tec-labs-auto-create-rsvp' ) . '</h3>';
 		$result .= '<div style="margin-left: 20px;">';
 		$result .= '<p>';
-		$result .= esc_html_x( 'Some text here about this settings section.', 'Setting section description', 'tec-labs-auto-create-rsvp' );
+		$result .= esc_html_x( 'Enable this if you would like to add an RSVP automatically to an event, when the event is created.', 'Setting section description', 'tec-labs-auto-create-rsvp' );
 		$result .= '</p>';
 		$result .= '</div>';
 
 		return $result;
+	}
+
+	private function get_event_categories() {
+		$args = [
+			'taxonomy' => 'tribe_events_cat',
+			'orderby' => 'name',
+			'order' => 'ASC',
+		];
+		$categories = get_categories( $args );
+
+		$dropdown = [ '' => '(All events)' ];
+
+		foreach ( $categories as $category ) {
+			$dropdown[ $category->cat_ID ] = $category->cat_name;
+		}
+
+		return $dropdown;
 	}
 
 }
