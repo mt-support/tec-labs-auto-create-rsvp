@@ -213,6 +213,11 @@ class Plugin extends \tad_DI52_ServiceProvider {
 
 		$options = $this->get_all_options();
 
+		// If we're updating the post, then bail.
+		if ( 'Update' == $data['save'] ) {
+			return;
+		}
+
 		// If the required category is not selected, then bail.
 		if ( isset( $options['acr-category'] ) && ! empty( $options['acr-category'] ) ) {
 			if ( ! in_array( $options['acr-category'], $data['tax_input']['tribe_events_cat'] ) ) {
@@ -237,8 +242,8 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		// Create the RSVP.
 		if ( $rsvp->ticket_add( $event_id, $custom_rsvp_data ) ) {
 			// Remove the category.
-			if ( $options['acr-remove-category'] && isset( $options['acr-category'] ) ) {
-				wp_remove_object_terms( $event_id, $options['acr-category'], 'tribe_events_cat' );
+			if ( isset( $options['acr-category'] ) && $options['acr-remove-category'] ) {
+				$x = wp_remove_object_terms( $event_id, (int) $options['acr-category'], 'tribe_events_cat' );
 			}
 			return true;
 		}
