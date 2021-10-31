@@ -104,7 +104,8 @@ class Plugin extends \tad_DI52_ServiceProvider {
 
 		// Start binds.
 
-
+		//add_action( 'tribe_events_update_meta', [ $this, 'add_custom_RSVP' ], 10, 3 );
+		$this->get_started();
 
 		// End binds.
 
@@ -195,5 +196,54 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		$settings = $this->get_settings();
 
 		return $settings->get_option( $option, $default );
+	}
+
+	public function get_started() {
+		$enabled = $this->get_option( 'acr-enable' );
+		if ( $enabled ) {
+			add_action( 'tribe_events_update_meta', [ $this, 'add_custom_RSVP' ], 10, 3 );
+		}
+	}
+
+	public function add_custom_RSVP( $event_id, $data, $event ) {
+		// If it's a community submission, then bail
+		if ( 'community-events' == $data['EventOrigin'] ) {
+			return;
+		}
+
+		$options = $this->get_all_options();
+
+		// If the required category is not selected, then bail.
+		if ( isset( $options['acr-category'] ) && ! empty( $options['acr-category'] ) ) {
+			if ( ! in_array( $options['acr-category'], $data['tax_input']['tribe_events_cat'] ) ) {
+				return;
+			}
+		}
+
+		// Create an RSVP object.
+		$rsvp = new \Tribe__Tickets__RSVP();
+
+		$custom_rsvp_data = [
+			'ticket_name'             => $options['acr-rsvp-name'] ?? "RSVP",
+			'ticket_description'      => $options['acr-rsvp-description'],
+			'ticket_show_description' => $options['acr-rsvp-show-description'],
+			'tribe-ticket'            => [
+				'capacity' => $options['acr-rsvp-capacity'],
+				'not_going' => $options['acr-rsvp-not-going'],
+			],
+			'ticket_provider'         => 'Tribe__Tickets__RSVP',
+		];
+
+		// Create the RSVP.
+		if ( $rsvp->ticket_add( $event_id, $custom_rsvp_data ) ) {
+			// Remove the category.
+			if ( $options['acr-remove-category'] && isset( $options['acr-category'] ) ) {
+				wp_remove_object_terms( $event_id, $options['acr-category'], 'tribe_events_cat' );
+			}
+			return true;
+		}
+
+		return false;
+
 	}
 }
