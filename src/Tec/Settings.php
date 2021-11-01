@@ -257,13 +257,13 @@ class Settings {
 				'validation_type' => 'boolean',
 				'default'         => false,
 			],
-			/*'acr-enable-on-update' => [
+			'acr-enable-on-update' => [
 				'type'            => 'checkbox_bool',
 				'label'           => esc_html__( 'Create an RSVP on Event Update', 'tec-labs-auto-create-rsvp' ),
-				'tooltip'         => esc_html__( 'By default an RSVP is created only when a new event is created. With this option an RSVP will also be created when an event is updated.', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'By default an RSVP is created only when a new event is created. With this option an RSVP will also be created when an event is updated. For safety, this option only works with category limitation.', 'tec-labs-auto-create-rsvp' ),
 				'validation_type' => 'boolean',
 				'default'         => false,
-			],*/
+			],
 			'acr-divider' => [
 				'type'            => 'html',
 				'html'            => '<hr>',

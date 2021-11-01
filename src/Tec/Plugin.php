@@ -229,7 +229,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 			)
 			&& 'publish' == $data['post_status']
 		) {
-			return;
+			return false;
 		}
 
 		// If it's a backend submission, and it's not enabled then bail.
@@ -237,7 +237,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 			'community-events' != $data['EventOrigin']
 			&& ! $backend_enabled
 		) {
-			return;
+			return false;
 		}
 
 		// If it's a community submission, and it's not enabled then bail.
@@ -245,18 +245,32 @@ class Plugin extends \tad_DI52_ServiceProvider {
 			'community-events' == $data['EventOrigin']
 			&& ! $community_enabled
 		) {
-			return;
+			return false;
 		}
+
+		$acr_remove_category = $options['acr-remove-category'];
 
 		// If we're updating the post, then bail.
 		if ( 'Update' == $data['save'] ) {
-			return;
+			if (
+				// Option is not enabled.
+				! tribe_is_truthy( $options['acr-enable-on-update'] )
+				|| (
+					tribe_is_truthy( $options['acr-enable-on-update'] )
+					&& ! is_numeric( $options['acr-category'] )
+				)
+			) {
+				return false;
+			}
+			else {
+				$acr_remove_category = true;
+			}
 		}
 
 		// If the required category is not selected, then bail.
 		if ( isset( $options['acr-category'] ) && ! empty( $options['acr-category'] ) ) {
 			if ( ! in_array( $options['acr-category'], $data['tax_input']['tribe_events_cat'] ) ) {
-				return;
+				return false;
 			}
 		}
 
@@ -299,7 +313,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		// Create the RSVP.
 		if ( $rsvp->ticket_add( $event_id, $custom_rsvp_data ) ) {
 			// Remove the category.
-			if ( isset( $options['acr-category'] ) && $options['acr-remove-category'] ) {
+			if ( isset( $options['acr-category'] ) && $acr_remove_category ) {
 				$x = wp_remove_object_terms( $event_id, (int) $options['acr-category'], 'tribe_events_cat' );
 			}
 			return true;
