@@ -275,7 +275,7 @@ class Settings {
 			'acr-rsvp-name' => [
 				'type'            => 'text',
 				'label'           => esc_html__( 'RSVP name', 'tec-labs-auto-create-rsvp' ),
-				'tooltip'         => esc_html__( 'This is the name of your RSVP. It is displayed on the frontend of your website and within RSVP emails. If left empty "RSVP" will be used. You can use the following placeholders:', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => $this->acr_rsvp_name_tooltip(),
 				'validation_type' => 'html',
 				'size' => 'large',
 				'can_be_empty' => true,
@@ -370,6 +370,17 @@ class Settings {
 		return $dropdown;
 	}
 
+	private function acr_rsvp_name_tooltip() {
+		$html = esc_html__( 'This is the name of your RSVP. It is displayed on the frontend of your website and within RSVP emails. If left empty "RSVP" will be used.', 'tec-labs-auto-create-rsvp' );
+		$html .= '<br>' . esc_html__( 'You can also use the following placeholders:', '') . '<br>';
+		$html .= '<code>{{event-title}}</code>, ';
+		$html .= '<code>{{event-start-date}}</code>, ';
+		$html .= '<code>{{event-start-time}}</code>, ';
+		$html .= '<code>{{event-end-date}}</code>, ';
+		$html .= '<code>{{event-end-time}}</code>';
+
+		return $html;
+	}
 	private function get_event_categories() {
 		$args = [
 			'taxonomy' => 'tribe_events_cat',

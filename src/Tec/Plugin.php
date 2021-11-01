@@ -269,11 +269,11 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		else {
 			$ticket_name = $options['acr-rsvp-name'];
 			$search = [
-				'{{event_title}}',
-				'{{event_start_date}}',
-				'{{event_start_time}}',
-				'{{event_end_date}}',
-				'{{event_end_time}}',
+				'{{event-title}}',
+				'{{event-start-date}}',
+				'{{event-start-time}}',
+				'{{event-end-date}}',
+				'{{event-end-time}}',
 			];
 			$replace = [
 				$data['post_title'],
