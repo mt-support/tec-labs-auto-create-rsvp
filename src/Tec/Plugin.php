@@ -9,6 +9,7 @@
 
 namespace Tribe\Extensions\Autocreate_RSVP;
 
+use Tribe__Date_Utils as Date;
 /**
  * Class Plugin
  *
@@ -221,6 +222,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 
 		// If we are publishing a draft or a pending, then bail.
 		// RSVP has been created when the draft / pending was saved.
+		// It's not the same as an update.
 		if (
 			(
 				'draft' == $data['original_post_status']
@@ -268,9 +270,9 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		else {
 			$ticket_name = $options['acr-rsvp-name'];
 			$ticket_name = str_replace( '{{event_title}}', $data['post_title'], $ticket_name );
-			$ticket_name = str_replace( '{{event_start_date}}', $data['EventStartDate'], $ticket_name );
+			$ticket_name = str_replace( '{{event_start_date}}', Date::date_only( $data['EventStartDate'] ), $ticket_name );
 			$ticket_name = str_replace( '{{event_start_time}}', $data['EventStartTime'], $ticket_name );
-			$ticket_name = str_replace( '{{event_end_date}}', $data['EventEndDate'], $ticket_name );
+			$ticket_name = str_replace( '{{event_end_date}}', Date::date_only( $data['EventEndDate'] ), $ticket_name );
 			$ticket_name = str_replace( '{{event_end_time}}', $data['EventEndTime'], $ticket_name );
 		}
 
