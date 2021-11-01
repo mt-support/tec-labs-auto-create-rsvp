@@ -4,7 +4,7 @@
  * Plugin URI:        https://theeventscalendar.com/extensions/auto-create-rsvp/
  * GitHub Plugin URI: https://github.com/mt-support/tec-labs-auto-create-rsvp
  * Description:       Automatically add an RSVP to an event when it is created.
- * Version:           1.0.0
+ * Version:           1.0.0-beta
  * Author:            The Events Calendar
  * Author URI:        https://evnt.is/1971
  * License:           GPL version 3 or any later version
