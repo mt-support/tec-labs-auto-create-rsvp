@@ -210,20 +210,39 @@ class Settings {
 	public function add_settings() {
 		$event_categories = $this->get_event_categories();
 
-		$fields = [
+		$fields0 = [
 			// TODO: Settings heading start. Remove this element if not needed. Also remove the corresponding `get_example_intro_text()` method below.
 			'acr-heading'   => [
 				'type' => 'html',
 				'html' => $this->get_example_intro_text(),
 			],
-			// TODO: Settings heading end.
-			'acr-enable' => [ // TODO: Change setting.
-				'type'            => 'checkbox_bool',
-				'label'           => esc_html__( 'Enable', 'tec-labs-auto-create-rsvp' ),
-				'tooltip'         => esc_html__( 'When enabled an RSVP will be automatically created for the event when the event is created.', 'tec-labs-auto-create-rsvp' ),
-				'validation_type' => 'boolean',
-				'default'         => false,
-			],
+		];
+
+		if ( class_exists( '\Tribe__Events__Community__Tickets__Main' ) ) {
+			$fields1 = [
+				'acr-enable'    => [
+					'type'            => 'dropdown',
+					'label'           => esc_html__( 'Enable', 'tec-labs-default-ticket-fieldset' ),
+					'tooltip'         => esc_html_x( 'Choose where you want to enable automatic RSVP creation.', 'Setting description', 'tec-labs-default-ticket-fieldset' ),
+					'validation_type' => 'options',
+					'options'         => $this->acr_enable_options(),
+				],
+			];
+		}
+		else {
+			$fields1 = [
+				// TODO: Settings heading end.
+				'acr-enable' => [ // TODO: Change setting.
+					'type'            => 'checkbox_bool',
+					'label'           => esc_html__( 'Enable', 'tec-labs-auto-create-rsvp' ),
+					'tooltip'         => esc_html__( 'When enabled an RSVP will be automatically created for the event when the event is created.', 'tec-labs-auto-create-rsvp' ),
+					'validation_type' => 'boolean',
+					'default'         => false,
+				],
+			];
+		}
+
+		$fields2 = [
 			'acr-category'    => [
 				'type'            => 'dropdown',
 				'label'           => esc_html__( 'Limit to category', 'tec-labs-default-ticket-fieldset' ),
@@ -292,6 +311,8 @@ class Settings {
 
 		];
 
+		$fields = array_merge( $fields0, $fields1, $fields2 );
+
 		$this->settings_helper->add_fields(
 			$this->prefix_settings_field_keys( $fields ),
 			'event-tickets',
@@ -336,6 +357,17 @@ class Settings {
 		$result .= '</div>';
 
 		return $result;
+	}
+
+	private function acr_enable_options() {
+		$dropdown = [
+			''          => 'Disable',
+			'backend'   => 'Backend only',
+			'community' => 'Community submissions only',
+			'both'      => 'Backend and Community submissions',
+		];
+
+		return $dropdown;
 	}
 
 	private function get_event_categories() {

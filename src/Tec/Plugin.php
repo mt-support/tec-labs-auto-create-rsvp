@@ -200,18 +200,52 @@ class Plugin extends \tad_DI52_ServiceProvider {
 
 	public function get_started() {
 		$enabled = $this->get_option( 'acr-enable' );
-		if ( $enabled ) {
+		if ( isset( $enabled ) && ! empty( $enabled ) ) {
 			add_action( 'tribe_events_update_meta', [ $this, 'add_custom_RSVP' ], 10, 3 );
 		}
 	}
 
 	public function add_custom_RSVP( $event_id, $data, $event ) {
-		// If it's a community submission, then bail
-		if ( 'community-events' == $data['EventOrigin'] ) {
+		$options = $this->get_all_options();
+
+		$backend_enabled = (
+			tribe_is_truthy( $options['acr-enable'] )
+			|| 'backend' == $options['acr-enable']
+			|| 'both' == $options['acr-enable']
+		);
+
+		$community_enabled = (
+			'community' == $options['acr-enable']
+			|| 'both' == $options['acr-enable']
+		);
+
+		// If we are publishing a draft or a pending, then bail.
+		// RSVP has been created when the draft / pending was saved.
+		if (
+			(
+				'draft' == $data['original_post_status']
+				|| 'pending' == $data['original_post_status']
+			)
+			&& 'publish' == $data['post_status']
+		) {
 			return;
 		}
 
-		$options = $this->get_all_options();
+		// If it's a backend submission, and it's not enabled then bail.
+		if (
+			'community-events' != $data['EventOrigin']
+			&& ! $backend_enabled
+		) {
+			return;
+		}
+
+		// If it's a community submission, and it's not enabled then bail.
+		if (
+			'community-events' == $data['EventOrigin']
+			&& ! $community_enabled
+		) {
+			return;
+		}
 
 		// If we're updating the post, then bail.
 		if ( 'Update' == $data['save'] ) {
