@@ -228,8 +228,20 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		// Create an RSVP object.
 		$rsvp = new \Tribe__Tickets__RSVP();
 
+		if ( ! isset ( $options['acr-rsvp-name'] ) || empty( $options['acr-rsvp-name'] ) ) {
+			$ticket_name = 'RSVP';
+		}
+		else {
+			$ticket_name = $options['acr-rsvp-name'];
+			$ticket_name = str_replace( '{{event_title}}', $data['post_title'], $ticket_name );
+			$ticket_name = str_replace( '{{event_start_date}}', $data['EventStartDate'], $ticket_name );
+			$ticket_name = str_replace( '{{event_start_time}}', $data['EventStartTime'], $ticket_name );
+			$ticket_name = str_replace( '{{event_end_date}}', $data['EventEndDate'], $ticket_name );
+			$ticket_name = str_replace( '{{event_end_time}}', $data['EventEndTime'], $ticket_name );
+		}
+
 		$custom_rsvp_data = [
-			'ticket_name'             => $options['acr-rsvp-name'] ?? "RSVP",
+			'ticket_name'             => $ticket_name,
 			'ticket_description'      => $options['acr-rsvp-description'],
 			'ticket_show_description' => $options['acr-rsvp-show-description'],
 			'tribe-ticket'            => [
