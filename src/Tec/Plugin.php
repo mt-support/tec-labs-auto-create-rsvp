@@ -9,7 +9,6 @@
 
 namespace Tribe\Extensions\Autocreate_RSVP;
 
-use Tribe__Date_Utils as Date;
 /**
  * Class Plugin
  *
@@ -269,11 +268,21 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		}
 		else {
 			$ticket_name = $options['acr-rsvp-name'];
-			$ticket_name = str_replace( '{{event_title}}', $data['post_title'], $ticket_name );
-			$ticket_name = str_replace( '{{event_start_date}}', Date::date_only( $data['EventStartDate'] ), $ticket_name );
-			$ticket_name = str_replace( '{{event_start_time}}', $data['EventStartTime'], $ticket_name );
-			$ticket_name = str_replace( '{{event_end_date}}', Date::date_only( $data['EventEndDate'] ), $ticket_name );
-			$ticket_name = str_replace( '{{event_end_time}}', $data['EventEndTime'], $ticket_name );
+			$search = [
+				'{{event_title}}',
+				'{{event_start_date}}',
+				'{{event_start_time}}',
+				'{{event_end_date}}',
+				'{{event_end_time}}',
+			];
+			$replace = [
+				$data['post_title'],
+				$this->format_date( $data['EventStartDate'] ),
+				$this->format_time( $data['EventStartTime'] ),
+				$this->format_date( $data['EventEndDate'] ),
+				$this->format_time( $data['EventEndTime'] ),
+			];
+			$ticket_name = str_replace( $search, $replace, $ticket_name );
 		}
 
 		$custom_rsvp_data = [
@@ -298,5 +307,19 @@ class Plugin extends \tad_DI52_ServiceProvider {
 
 		return false;
 
+	}
+
+	public function format_time( $time ) {
+		$time = is_numeric( $time ) ? $time : strtotime( $time );
+		$time_pattern = apply_filters( 'tec_labs_acr_time_pattern', get_option( 'time_format' ) );
+
+		return date( $time_pattern, $time );
+	}
+	
+	public function format_date( $date ) {
+		$date = is_numeric( $date ) ? $date : strtotime( $date );
+		$date_pattern = apply_filters( 'tec_labs_acr_date_pattern', get_option( 'date_format' ) );
+
+		return date( $date_pattern, $date );
 	}
 }
