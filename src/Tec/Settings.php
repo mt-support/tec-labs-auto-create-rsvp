@@ -246,24 +246,24 @@ class Settings {
 			'acr-category'    => [
 				'type'            => 'dropdown',
 				'label'           => esc_html__( 'Limit to category', 'tec-labs-default-ticket-fieldset' ),
-				'tooltip'         => esc_html_x( 'You can limit adding the RSVP to events that are created in a certain category only.', 'Setting description', 'tec-labs-default-ticket-fieldset' ),
+				'tooltip'         => esc_html_x( 'You can limit adding the RSVP to events that are created in the above selected category only.', 'Setting description', 'tec-labs-default-ticket-fieldset' ),
 				'validation_type' => 'options',
 				'options'         => $event_categories,
 			],
 			'acr-remove-category' => [
 				'type'            => 'checkbox_bool',
 				'label'           => esc_html__( 'Remove category after creation', 'tec-labs-auto-create-rsvp' ),
-				'tooltip'         => esc_html__( 'By default the category is not removed from the event after it is created. With enabling this option the category will be removed from event.', 'tec-labs-auto-create-rsvp' ),
+				'tooltip'         => esc_html__( 'By default the category is not removed from the event after it is created. Enable this to remove the category.', 'tec-labs-auto-create-rsvp' ),
 				'validation_type' => 'boolean',
 				'default'         => false,
 			],
-			'acr-enable-on-update' => [
+			/*'acr-enable-on-update' => [
 				'type'            => 'checkbox_bool',
 				'label'           => esc_html__( 'Create an RSVP on Event Update', 'tec-labs-auto-create-rsvp' ),
 				'tooltip'         => esc_html__( 'By default an RSVP is created only when a new event is created. With this option an RSVP will also be created when an event is updated.', 'tec-labs-auto-create-rsvp' ),
 				'validation_type' => 'boolean',
 				'default'         => false,
-			],
+			],*/
 			'acr-divider' => [
 				'type'            => 'html',
 				'html'            => '<hr>',
@@ -349,7 +349,7 @@ class Settings {
 	 * @return string
 	 */
 	private function get_example_intro_text() {
-		$result = '<h3>' . esc_html_x( 'Auto-create RSVP', 'Settings header', 'tec-labs-auto-create-rsvp' ) . '</h3>';
+		$result = '<h3 id="tec-labs-auto-create-rsvp-settings">' . esc_html_x( 'Auto-create RSVP', 'Settings header', 'tec-labs-auto-create-rsvp' ) . '</h3>';
 		$result .= '<div style="margin-left: 20px;">';
 		$result .= '<p>';
 		$result .= esc_html_x( 'Enable this if you would like to add an RSVP automatically to an event, when the event is created.', 'Setting section description', 'tec-labs-auto-create-rsvp' );
