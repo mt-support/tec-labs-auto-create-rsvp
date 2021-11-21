@@ -2,20 +2,22 @@
 /**
  * Plugin Class.
  *
- * @since 1.0.0
- *
  * @package Tribe\Extensions\Autocreate_RSVP
+ * @since   1.0.0
+ *
  */
 
 namespace Tribe\Extensions\Autocreate_RSVP;
+
 use Tribe__Date_Utils as Date;
+use Tribe__Tickets__RSVP;
 
 /**
  * Class Plugin
  *
- * @since 1.0.0
- *
  * @package Tribe\Extensions\Autocreate_RSVP
+ * @since   1.0.0
+ *
  */
 class Plugin extends \tad_DI52_ServiceProvider {
 	/**
@@ -142,9 +144,9 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * Settings_Helper will append a trailing underscore before each option.
 	 *
-	 * @return string
-     *
 	 * @see \Tribe\Extensions\Autocreate_RSVP\Settings::set_options_prefix()
+	 * @return string
+	 *
 	 */
 	private function get_options_prefix() {
 		return (string) str_replace( '-', '_', 'tec-labs-auto-create-rsvp' );
@@ -177,7 +179,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	/**
 	 * Get a specific extension option.
 	 *
-	 * @param $option
+	 * @param        $option
 	 * @param string $default
 	 *
 	 * @return array
@@ -267,8 +269,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 				)
 			) {
 				return false;
-			}
-			else {
+			} else {
 				$acr_remove_category = true;
 			}
 		}
@@ -287,7 +288,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		}
 
 		// Create an RSVP object.
-		$rsvp = new \Tribe__Tickets__RSVP();
+		$rsvp = new Tribe__Tickets__RSVP();
 
 		// Set the name of the RSVP.
 		if (
@@ -297,14 +298,14 @@ class Plugin extends \tad_DI52_ServiceProvider {
 			$ticket_name = 'RSVP';
 		} else {
 			$ticket_name = $options['acr-rsvp-name'];
-			$search = [
+			$search      = [
 				'{{event-title}}',
 				'{{event-start-date}}',
 				'{{event-start-time}}',
 				'{{event-end-date}}',
 				'{{event-end-time}}',
 			];
-			$replace = [
+			$replace     = [
 				$data['post_title'],
 				$this->format_date( $data['EventStartDate'] ),
 				$this->format_time( $data['EventStartTime'] ),
@@ -318,10 +319,11 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		/**
 		 * Filter for the RSVP name.
 		 *
-		 * @param $ticket_name string The title of the RSVP
+		 * @since 1.0.0
+		 *
 		 * @param $data        array  Event data
 		 *
-		 * @since 1.0.0
+		 * @param $ticket_name string The title of the RSVP
 		 */
 		$ticket_name = apply_filters( 'tec_labs_acr_rsvp_title', $ticket_name, $data );
 
@@ -373,7 +375,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		$content .= "\n\r" . $search;
 
 		return wp_update_post( [
-			'ID' => $post_id,
+			'ID'           => $post_id,
 			'post_content' => $content,
 		] );
 	}
@@ -467,7 +469,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		if ( $action == 'add_rsvp' ) {
 			foreach ( $post_ids as $post_id ) {
 				$event_meta = tribe_get_event_meta( $post_id, false, false );
-				
+
 				$data                   = [];
 				$data['post_title']     = get_the_title( $post_id );
 				$data['EventStartDate'] = Date::date_only( $event_meta['_EventStartDate'][0] );
