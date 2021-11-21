@@ -101,8 +101,6 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		$this->get_settings();
 
 		// Start binds.
-
-		//add_action( 'tribe_events_update_meta', [ $this, 'add_custom_RSVP' ], 10, 3 );
 		$this->get_started();
 
 		$this->start_bulk_actions();
@@ -254,12 +252,16 @@ class Plugin extends \tad_DI52_ServiceProvider {
 
 		$acr_remove_category = $options['acr-remove-category'];
 
-		// If we're updating the post, then bail.
+		// If we're updating the post, then bail, unless a category is set.
+		// (RSVP has been created when the post was first saved.)
+		// RSVP creation on update is allowed IF the editor chooses the required category.
+		// In this case the category is going to be removed from the post to prevent further automatic creation.
 		if ( 'Update' == $data['save'] ) {
 			if (
 				// Option is not enabled.
 				! tribe_is_truthy( $options['acr-enable-on-update'] )
 				|| (
+					// Option is enabled but there is no category selected.
 					tribe_is_truthy( $options['acr-enable-on-update'] )
 					&& ! is_numeric( $options['acr-category'] )
 				)
@@ -271,9 +273,14 @@ class Plugin extends \tad_DI52_ServiceProvider {
 			}
 		}
 
-		// If the required category is not selected, then bail.
-		// If it's a bulk action, then we skip this, assuming they want to create the RSVP in any case.
-		if ( ! $data['bulk_action'] && isset( $options['acr-category'] ) && ! empty( $options['acr-category'] ) ) {
+		// If it's a bulk action, then we skip this (so if it's not a bulk action, then we do this),
+		// assuming the editor wants to create the RSVP in any case.
+		if (
+			! $data['bulk_action']
+			&& isset( $options['acr-category'] )
+			&& ! empty( $options['acr-category'] )
+		) {
+			// If the required category is not selected for the post, then bail.
 			if ( ! in_array( $options['acr-category'], $data['tax_input']['tribe_events_cat'] ) ) {
 				return false;
 			}
@@ -283,10 +290,12 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		$rsvp = new \Tribe__Tickets__RSVP();
 
 		// Set the name of the RSVP.
-		if ( ! isset ( $options['acr-rsvp-name'] ) || empty( $options['acr-rsvp-name'] ) ) {
+		if (
+			! isset ( $options['acr-rsvp-name'] )
+			|| empty( $options['acr-rsvp-name'] )
+		) {
 			$ticket_name = 'RSVP';
-		}
-		else {
+		} else {
 			$ticket_name = $options['acr-rsvp-name'];
 			$search = [
 				'{{event-title}}',
@@ -378,6 +387,12 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 */
 	public function format_time( $time ) {
 		$time = is_numeric( $time ) ? $time : strtotime( $time );
+
+		/**
+		 * Filter the time format.
+		 *
+		 * @since 1.0.0
+		 */
 		$time_pattern = apply_filters( 'tec_labs_acr_time_pattern', get_option( 'time_format' ) );
 
 		return date( $time_pattern, $time );
@@ -392,11 +407,22 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 */
 	public function format_date( $date ) {
 		$date = is_numeric( $date ) ? $date : strtotime( $date );
+
+		/**
+		 * Filter the date format.
+		 *
+		 * @since 1.0.0
+		 */
 		$date_pattern = apply_filters( 'tec_labs_acr_date_pattern', get_option( 'date_format' ) );
 
 		return date( $date_pattern, $date );
 	}
 
+	/**
+	 * Add bulk action for the post types selected in the Events > Settings > Tickets settings
+	 *
+	 * @return bool
+	 */
 	public function start_bulk_actions() {
 		$post_types = tribe_get_option( 'ticket-enabled-post-types' );
 
@@ -420,12 +446,16 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 * @return array
 	 */
 	function bulk_add_rsvp( $bulk_actions ) {
-		$bulk_actions['add_rsvp'] = __( 'Add RSVP', 'tec-labs-auto-create-rsvp' );
+		$bulk_actions['add_rsvp'] = sprintf(
+			__( 'Add %s', 'tec-labs-auto-create-rsvp' ),
+			tribe_get_rsvp_label_singular()
+		);
+
 		return $bulk_actions;
 	}
 
 	/**
-	 * Executing the bulk action: adding RSVPs to the selected posts.
+	 * Executing the bulk action: add RSVPs to the selected posts.
 	 *
 	 * @param $redirect_url string The url where the page will redirect after completing the action.
 	 * @param $action       string The action.
@@ -437,6 +467,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		if ( $action == 'add_rsvp' ) {
 			foreach ( $post_ids as $post_id ) {
 				$event_meta = tribe_get_event_meta( $post_id, false, false );
+				
 				$data                   = [];
 				$data['post_title']     = get_the_title( $post_id );
 				$data['EventStartDate'] = Date::date_only( $event_meta['_EventStartDate'][0] );
