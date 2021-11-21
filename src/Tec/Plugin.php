@@ -341,14 +341,43 @@ class Plugin extends \tad_DI52_ServiceProvider {
 
 		// Create the RSVP.
 		if ( $rsvp->ticket_add( $event_id, $custom_rsvp_data ) ) {
+			// Add an RSVP block to the post if it doesn't have one yet.
+			$this->add_rsvp_block_to_post( $event_id );
+
 			// Remove the category.
 			if ( isset( $options['acr-category'] ) && $acr_remove_category ) {
-				$category_remove_success = wp_remove_object_terms( $event_id, (int) $options['acr-category'], 'tribe_events_cat' );
+				wp_remove_object_terms( $event_id, (int) $options['acr-category'], 'tribe_events_cat' );
 			}
+
 			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Add the markup for the RSVP block to the post.
+	 *
+	 * @param $post_id string The post ID.
+	 *
+	 * @return false|int|\WP_Error
+	 */
+	public function add_rsvp_block_to_post( $post_id ) {
+		$content = get_the_content( null, null, $post_id );
+
+		$search = '<!-- wp:tribe/rsvp /-->';
+
+		// Do we have an RSVP block already setup? (we should)
+		if ( true === strpos( $content, $search ) ) {
+			return false;
+		}
+
+		$content .= "\n\r" . $search;
+
+		return wp_update_post( [
+			'ID' => $post_id,
+			'post_content' => $content,
+		] );
 	}
 
 	/**
