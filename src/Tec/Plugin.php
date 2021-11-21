@@ -304,6 +304,13 @@ class Plugin extends \tad_DI52_ServiceProvider {
 			$ticket_name = str_replace( $search, $replace, $ticket_name );
 		}
 
+		/**
+		 * Filter for the RSVP title.
+		 *
+		 * @param $ticket_name string The title of the RSVP
+		 */
+		$ticket_name = apply_filters( 'tec_labs_acr_rsvp_title', $ticket_name );
+
 		$custom_rsvp_data = [
 			'ticket_name'             => $ticket_name,
 			'ticket_description'      => $options['acr-rsvp-description'],
@@ -358,7 +365,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 				$data['EventEndDate']   = Date::date_only( $event_meta['_EventEndDate'][0] );
 				$data['EventEndTime']   = Date::time_only( $event_meta['_EventEndDate'][0] );
 				$data['bulk_action']    = true;
-				
+
 				$this->add_custom_RSVP( $post_id, $data, null );
 			}
 			$redirect_url = add_query_arg( 'add_rsvp', count( $post_ids ), $redirect_url );
