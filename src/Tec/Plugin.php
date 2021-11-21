@@ -390,6 +390,8 @@ class Plugin extends \tad_DI52_ServiceProvider {
 			add_filter( 'bulk_actions-edit-' . $post_type, [ $this, 'bulk_add_rsvp' ] );
 			add_filter( 'handle_bulk_actions-edit-' . $post_type, [ $this, 'handle_bulk_add_rsvp' ], 10, 3 );
 		}
+
+		return true;
 	}
 
 	/**
@@ -397,7 +399,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @param $bulk_actions array The list of the bulk actions.
 	 *
-	 * @return mixed
+	 * @return array
 	 */
 	function bulk_add_rsvp( $bulk_actions ) {
 		$bulk_actions['add_rsvp'] = __( 'Add RSVP', 'tec-labs-auto-create-rsvp' );
@@ -411,7 +413,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 * @param $action       string The action.
 	 * @param $post_ids     array  A list of the selected post IDs.
 	 *
-	 * @return mixed|string
+	 * @return string
 	 */
 	function handle_bulk_add_rsvp( $redirect_url, $action, $post_ids ) {
 		if ( $action == 'add_rsvp' ) {
