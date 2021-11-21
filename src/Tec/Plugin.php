@@ -308,8 +308,9 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		 * Filter for the RSVP title.
 		 *
 		 * @param $ticket_name string The title of the RSVP
+		 * @param $data        array  Event data
 		 */
-		$ticket_name = apply_filters( 'tec_labs_acr_rsvp_title', $ticket_name );
+		$ticket_name = apply_filters( 'tec_labs_acr_rsvp_title', $ticket_name, $data );
 
 		$custom_rsvp_data = [
 			'ticket_name'             => $ticket_name,
