@@ -316,8 +316,8 @@ class Settings {
 		$this->settings_helper->add_fields(
 			$this->prefix_settings_field_keys( $fields ),
 			'event-tickets',
-			'ticket-paypal-heading',
-			true
+			'ticket-attendee-page-id',
+			false
 		);
 	}
 
