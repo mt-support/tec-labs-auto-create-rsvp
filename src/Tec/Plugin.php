@@ -108,8 +108,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		//add_action( 'tribe_events_update_meta', [ $this, 'add_custom_RSVP' ], 10, 3 );
 		$this->get_started();
 
-		add_filter( 'bulk_actions-edit-tribe_events', [ $this, 'bulk_add_rsvp' ] );
-		add_filter( 'handle_bulk_actions-edit-tribe_events', [ $this, 'handle_bulk_add_rsvp' ], 10, 3 );
+		$this->start_bulk_actions();
 		add_action( 'admin_notices', [ $this, 'bulk_add_rsvp_admin_notice' ] );
 		// End binds.
 
@@ -380,6 +379,19 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		return date( $date_pattern, $date );
 	}
 
+	public function start_bulk_actions() {
+		$post_types = tribe_get_option( 'ticket-enabled-post-types' );
+
+		if ( empty( $post_types ) ) {
+			return false;
+		}
+
+		foreach ( $post_types as $post_type ) {
+			add_filter( 'bulk_actions-edit-' . $post_type, [ $this, 'bulk_add_rsvp' ] );
+			add_filter( 'handle_bulk_actions-edit-' . $post_type, [ $this, 'handle_bulk_add_rsvp' ], 10, 3 );
+		}
+	}
+
 	/**
 	 * Add an option to the bulk actions dropdown.
 	 *
@@ -426,15 +438,24 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 */
 	function bulk_add_rsvp_admin_notice() {
 		if ( ! empty( $_REQUEST['add_rsvp'] ) ) {
-			$num_changed  = (int) $_REQUEST['add_rsvp'];
-			$events_label = ( 1 === $num_changed ) ? tribe_get_event_label_singular_lowercase() : tribe_get_event_label_plural_lowercase();
+			// Get the post type object.
+			$obj = get_post_type_object( $_REQUEST['post_type'] );
+
+			// Get the labels of the post type.
+			$singular_label = $obj->labels->singular_name;
+			$plural_label   = $obj->labels->name;
+
+			// Get how many posts were changed.
+			$num_changed = (int) $_REQUEST['add_rsvp'];
+
+			$post_label = ( 1 === $num_changed ) ? $singular_label : $plural_label;
 			printf(
 				'<div id="message" class="updated notice is-dismissible"><p>' .
-				/* Translators: %d: Number of posts; %s: Singular or plural event label; */
+				/* Translators: %d: Number of posts; %s: Singular or plural label of the post type; */
 				__( 'Added RSVP to %d %s.', 'tec-labs-auto-create-rsvp' )
 				. '</p></div>',
 				$num_changed,
-				$events_label
+				strtolower( $post_label )
 			);
 		}
 	}
