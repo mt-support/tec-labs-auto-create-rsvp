@@ -202,6 +202,9 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		return $settings->get_option( $option, $default );
 	}
 
+	/**
+	 * Check if functionality is enabled and run if yes.
+	 */
 	public function get_started() {
 		$enabled = $this->get_option( 'acr-enable' );
 		if ( isset( $enabled ) && ! empty( $enabled ) ) {
@@ -209,6 +212,15 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		}
 	}
 
+	/**
+	 * Add and RSVP option to an event.
+	 *
+	 * @param $event_id integer The post ID of the event.
+	 * @param $data     array   Event data.
+	 * @param $event    object  The Event object.
+	 *
+	 * @return bool
+	 */
 	public function add_custom_RSVP( $event_id, $data, $event ) {
 		$options = $this->get_all_options();
 
@@ -282,6 +294,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		// Create an RSVP object.
 		$rsvp = new \Tribe__Tickets__RSVP();
 
+		// Set the name of the RSVP.
 		if ( ! isset ( $options['acr-rsvp-name'] ) || empty( $options['acr-rsvp-name'] ) ) {
 			$ticket_name = 'RSVP';
 		}
@@ -301,23 +314,27 @@ class Plugin extends \tad_DI52_ServiceProvider {
 				$this->format_date( $data['EventEndDate'] ),
 				$this->format_time( $data['EventEndTime'] ),
 			];
+
 			$ticket_name = str_replace( $search, $replace, $ticket_name );
 		}
 
 		/**
-		 * Filter for the RSVP title.
+		 * Filter for the RSVP name.
 		 *
 		 * @param $ticket_name string The title of the RSVP
 		 * @param $data        array  Event data
+		 *
+		 * @since 1.0.0
 		 */
 		$ticket_name = apply_filters( 'tec_labs_acr_rsvp_title', $ticket_name, $data );
 
+		// Compile the RSVP data in an array.
 		$custom_rsvp_data = [
-			'ticket_name'             => $ticket_name,
+			'ticket_name'             => esc_html( $ticket_name ),
 			'ticket_description'      => $options['acr-rsvp-description'],
 			'ticket_show_description' => $options['acr-rsvp-show-description'],
 			'tribe-ticket'            => [
-				'capacity' => $options['acr-rsvp-capacity'],
+				'capacity'  => $options['acr-rsvp-capacity'],
 				'not_going' => $options['acr-rsvp-not-going'],
 			],
 			'ticket_provider'         => 'Tribe__Tickets__RSVP',
@@ -327,22 +344,35 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		if ( $rsvp->ticket_add( $event_id, $custom_rsvp_data ) ) {
 			// Remove the category.
 			if ( isset( $options['acr-category'] ) && $acr_remove_category ) {
-				$x = wp_remove_object_terms( $event_id, (int) $options['acr-category'], 'tribe_events_cat' );
+				$category_remove_success = wp_remove_object_terms( $event_id, (int) $options['acr-category'], 'tribe_events_cat' );
 			}
 			return true;
 		}
 
 		return false;
-
 	}
 
+	/**
+	 * Format the time according to the WordPress setting.
+	 *
+	 * @param $time string
+	 *
+	 * @return false|string
+	 */
 	public function format_time( $time ) {
 		$time = is_numeric( $time ) ? $time : strtotime( $time );
 		$time_pattern = apply_filters( 'tec_labs_acr_time_pattern', get_option( 'time_format' ) );
 
 		return date( $time_pattern, $time );
 	}
-	
+
+	/**
+	 * Format the date according to the WordPress setting.
+	 *
+	 * @param $date string
+	 *
+	 * @return false|string
+	 */
 	public function format_date( $date ) {
 		$date = is_numeric( $date ) ? $date : strtotime( $date );
 		$date_pattern = apply_filters( 'tec_labs_acr_date_pattern', get_option( 'date_format' ) );
@@ -350,11 +380,27 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		return date( $date_pattern, $date );
 	}
 
+	/**
+	 * Add an option to the bulk actions dropdown.
+	 *
+	 * @param $bulk_actions array The list of the bulk actions.
+	 *
+	 * @return mixed
+	 */
 	function bulk_add_rsvp( $bulk_actions ) {
 		$bulk_actions['add_rsvp'] = __( 'Add RSVP', 'tec-labs-auto-create-rsvp' );
 		return $bulk_actions;
 	}
 
+	/**
+	 * Executing the bulk action: adding RSVPs to the selected posts.
+	 *
+	 * @param $redirect_url string The url where the page will redirect after completing the action.
+	 * @param $action       string The action.
+	 * @param $post_ids     array  A list of the selected post IDs.
+	 *
+	 * @return mixed|string
+	 */
 	function handle_bulk_add_rsvp( $redirect_url, $action, $post_ids ) {
 		if ( $action == 'add_rsvp' ) {
 			foreach ( $post_ids as $post_id ) {
@@ -375,9 +421,12 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		return $redirect_url;
 	}
 
+	/**
+	 * Prints and admin notice after completing the bulk action.
+	 */
 	function bulk_add_rsvp_admin_notice() {
 		if ( ! empty( $_REQUEST['add_rsvp'] ) ) {
-			$num_changed = (int) $_REQUEST['add_rsvp'];
+			$num_changed  = (int) $_REQUEST['add_rsvp'];
 			$events_label = ( 1 === $num_changed ) ? tribe_get_event_label_singular_lowercase() : tribe_get_event_label_plural_lowercase();
 			printf(
 				'<div id="message" class="updated notice is-dismissible"><p>' .
