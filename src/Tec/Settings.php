@@ -12,8 +12,6 @@ use Tribe__Settings_Manager;
 
 /**
  * Do the Settings.
- *
- * TODO: Delete file if not using settings
  */
 class Settings {
 
@@ -35,8 +33,6 @@ class Settings {
 
 	/**
 	 * Settings constructor.
-	 *
-	 * TODO: Update this entire class for your needs, or remove the entire `src` directory this file is in and do not load it in the main plugin file.
 	 *
 	 * @param string $options_prefix Recommended: the plugin text domain, with hyphens converted to underscores.
 	 */
@@ -204,17 +200,14 @@ class Settings {
 	/**
 	 * Adds a new section of fields to Events > Settings > General tab, appearing after the "Map Settings" section
 	 * and before the "Miscellaneous Settings" section.
-	 *
-	 * TODO: Move the setting to where you want and update this docblock. If you like it here, just delete this TODO.
 	 */
 	public function add_settings() {
 		$event_categories = $this->get_event_categories();
 
 		$fields0 = [
-			// TODO: Settings heading start. Remove this element if not needed. Also remove the corresponding `get_example_intro_text()` method below.
 			'acr-heading'   => [
 				'type' => 'html',
-				'html' => $this->get_example_intro_text(),
+				'html' => $this->get_acr_heading(),
 			],
 		];
 
@@ -231,8 +224,7 @@ class Settings {
 		}
 		else {
 			$fields1 = [
-				// TODO: Settings heading end.
-				'acr-enable' => [ // TODO: Change setting.
+				'acr-enable' => [
 					'type'            => 'checkbox_bool',
 					'label'           => esc_html__( 'Enable', 'tec-labs-auto-create-rsvp' ),
 					'tooltip'         => esc_html__( 'When enabled an RSVP will be automatically created for the event when the event is created.', 'tec-labs-auto-create-rsvp' ),
@@ -344,11 +336,9 @@ class Settings {
 	/**
 	 * Here is an example of getting some HTML for the Settings Header.
 	 *
-	 * TODO: Delete this method if you do not need a heading for your settings. Also remove the corresponding element in the the $fields array in the `add_settings()` method above.
-	 *
 	 * @return string
 	 */
-	private function get_example_intro_text() {
+	private function get_acr_heading() {
 		$result = '<h3 id="tec-labs-auto-create-rsvp-settings">' . esc_html_x( 'Auto-create RSVP', 'Settings header', 'tec-labs-auto-create-rsvp' ) . '</h3>';
 		$result .= '<div style="margin-left: 20px;">';
 		$result .= '<p>';
