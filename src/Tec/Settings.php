@@ -2,10 +2,11 @@
 /**
  * Settings Object.
  *
- * @since 1.0.0
- *
  * @package Tribe\Extensions\Autocreate_RSVP
+ * @since   1.0.0
+ *
  */
+
 namespace Tribe\Extensions\Autocreate_RSVP;
 
 use Tribe__Settings_Manager;
@@ -205,7 +206,7 @@ class Settings {
 		$event_categories = $this->get_event_categories();
 
 		$fields0 = [
-			'acr-heading'   => [
+			'acr-heading' => [
 				'type' => 'html',
 				'html' => $this->get_acr_heading(),
 			],
@@ -213,7 +214,7 @@ class Settings {
 
 		if ( class_exists( '\Tribe__Events__Community__Tickets__Main' ) ) {
 			$fields1 = [
-				'acr-enable'    => [
+				'acr-enable' => [
 					'type'            => 'dropdown',
 					'label'           => esc_html__( 'Enable', 'tec-labs-default-ticket-fieldset' ),
 					'tooltip'         => esc_html_x( 'Choose where you want to enable automatic RSVP creation.', 'Setting description', 'tec-labs-default-ticket-fieldset' ),
@@ -221,8 +222,7 @@ class Settings {
 					'options'         => $this->acr_enable_options(),
 				],
 			];
-		}
-		else {
+		} else {
 			$fields1 = [
 				'acr-enable' => [
 					'type'            => 'checkbox_bool',
@@ -235,44 +235,44 @@ class Settings {
 		}
 
 		$fields2 = [
-			'acr-category'    => [
+			'acr-category'               => [
 				'type'            => 'dropdown',
 				'label'           => esc_html__( 'Limit to category', 'tec-labs-default-ticket-fieldset' ),
 				'tooltip'         => esc_html_x( 'You can limit adding the RSVP to events that are created in the above selected category only.', 'Setting description', 'tec-labs-default-ticket-fieldset' ),
 				'validation_type' => 'options',
 				'options'         => $event_categories,
 			],
-			'acr-remove-category' => [
+			'acr-remove-category'        => [
 				'type'            => 'checkbox_bool',
 				'label'           => esc_html__( 'Remove category after creation', 'tec-labs-auto-create-rsvp' ),
 				'tooltip'         => esc_html__( 'By default the category is not removed from the event after it is created. Enable this to remove the category.', 'tec-labs-auto-create-rsvp' ),
 				'validation_type' => 'boolean',
 				'default'         => false,
 			],
-			'acr-enable-on-update' => [
+			'acr-enable-on-update'       => [
 				'type'            => 'checkbox_bool',
 				'label'           => esc_html__( 'Create an RSVP on Event Update', 'tec-labs-auto-create-rsvp' ),
 				'tooltip'         => esc_html__( 'By default an RSVP is created only when a new event is created. With this option an RSVP will also be created when an event is updated. For safety, this option only works with category limitation.', 'tec-labs-auto-create-rsvp' ),
 				'validation_type' => 'boolean',
 				'default'         => false,
 			],
-			'acr-divider' => [
-				'type'            => 'html',
-				'html'            => '<hr>',
+			'acr-divider'                => [
+				'type' => 'html',
+				'html' => '<hr>',
 			],
 			'acr-default-values-heading' => [
-				'type'            => 'html',
-				'html'            => '<p>' . esc_html__( 'You can define the values for the automatically created RSVP here.', 'tec-labs-auto-create-rsvp') . '</p>',
+				'type' => 'html',
+				'html' => '<p>' . esc_html__( 'You can define the values for the automatically created RSVP here.', 'tec-labs-auto-create-rsvp' ) . '</p>',
 			],
-			'acr-rsvp-name' => [
+			'acr-rsvp-name'              => [
 				'type'            => 'text',
 				'label'           => esc_html__( 'RSVP name', 'tec-labs-auto-create-rsvp' ),
 				'tooltip'         => $this->acr_rsvp_name_tooltip(),
 				'validation_type' => 'html',
-				'size' => 'large',
-				'can_be_empty' => true,
+				'size'            => 'large',
+				'can_be_empty'    => true,
 			],
-			'acr-rsvp-description' => [
+			'acr-rsvp-description'       => [
 				'type'            => 'textarea',
 				'label'           => esc_html__( 'Description', 'tec-labs-auto-create-rsvp' ),
 				'tooltip'         => esc_html__( 'This is the description of your RSVP.', 'tec-labs-auto-create-rsvp' ),
@@ -285,22 +285,21 @@ class Settings {
 				'validation_type' => 'boolean',
 				'default'         => true,
 			],
-			'acr-rsvp-capacity' => [
+			'acr-rsvp-capacity'          => [
 				'type'            => 'text',
 				'label'           => esc_html__( 'Capacity', 'tec-labs-auto-create-rsvp' ),
 				'tooltip'         => esc_html__( 'Leave blank for unlimited', 'tec-labs-auto-create-rsvp' ),
 				'validation_type' => 'positive_int',
-				'size' => 'small',
-				'can_be_empty' => true,
+				'size'            => 'small',
+				'can_be_empty'    => true,
 			],
-			'acr-rsvp-not-going' => [
+			'acr-rsvp-not-going'         => [
 				'type'            => 'checkbox_bool',
 				'label'           => esc_html__( "Can't Go", 'tec-labs-auto-create-rsvp' ),
 				'tooltip'         => esc_html__( 'Enable "Can\'t Go" responses', 'tec-labs-auto-create-rsvp' ),
 				'validation_type' => 'boolean',
 				'default'         => false,
 			],
-
 		];
 
 		$fields = array_merge( $fields0, $fields1, $fields2 );
@@ -362,7 +361,7 @@ class Settings {
 
 	private function acr_rsvp_name_tooltip() {
 		$html = esc_html__( 'This is the name of your RSVP. It is displayed on the frontend of your website and within RSVP emails. If left empty "RSVP" will be used.', 'tec-labs-auto-create-rsvp' );
-		$html .= '<br>' . esc_html__( 'You can also use the following placeholders:', '') . '<br>';
+		$html .= '<br>' . esc_html__( 'You can also use the following placeholders:', '' ) . '<br>';
 		$html .= '<code>{{event-title}}</code>, ';
 		$html .= '<code>{{event-start-date}}</code>, ';
 		$html .= '<code>{{event-start-time}}</code>, ';
@@ -371,12 +370,13 @@ class Settings {
 
 		return $html;
 	}
+
 	private function get_event_categories() {
-		$args = [
-			'taxonomy' => 'tribe_events_cat',
+		$args       = [
+			'taxonomy'   => 'tribe_events_cat',
 			'hide_empty' => false,
-			'orderby' => 'name',
-			'order' => 'ASC',
+			'orderby'    => 'name',
+			'order'      => 'ASC',
 		];
 		$categories = get_categories( $args );
 
