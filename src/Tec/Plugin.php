@@ -8,6 +8,7 @@
  */
 
 namespace Tribe\Extensions\Autocreate_RSVP;
+use Tribe__Date_Utils as Date;
 
 /**
  * Class Plugin
@@ -348,8 +349,16 @@ class Plugin extends \tad_DI52_ServiceProvider {
 
 	function handle_bulk_add_rsvp( $redirect_url, $action, $post_ids ) {
 		if ( $action == 'add_rsvp' ) {
-			$data['bulk_action'] = true;
 			foreach ( $post_ids as $post_id ) {
+				$event_meta = tribe_get_event_meta( $post_id, false, false );
+				$data                   = [];
+				$data['post_title']     = get_the_title( $post_id );
+				$data['EventStartDate'] = Date::date_only( $event_meta['_EventStartDate'][0] );
+				$data['EventStartTime'] = Date::time_only( $event_meta['_EventStartDate'][0] );
+				$data['EventEndDate']   = Date::date_only( $event_meta['_EventEndDate'][0] );
+				$data['EventEndTime']   = Date::time_only( $event_meta['_EventEndDate'][0] );
+				$data['bulk_action']    = true;
+				
 				$this->add_custom_RSVP( $post_id, $data, null );
 			}
 			$redirect_url = add_query_arg( 'add_rsvp', count( $post_ids ), $redirect_url );
