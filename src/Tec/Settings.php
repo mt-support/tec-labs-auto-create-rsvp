@@ -227,7 +227,7 @@ class Settings {
 				'acr-enable' => [
 					'type'            => 'checkbox_bool',
 					'label'           => esc_html__( 'Enable', 'tec-labs-auto-create-rsvp' ),
-					'tooltip'         => esc_html__( 'When enabled an RSVP will be automatically created for the event when the event is created.', 'tec-labs-auto-create-rsvp' ),
+					'tooltip'         => esc_html__( 'When enabled an RSVP will be automatically created for the events when they are created.', 'tec-labs-auto-create-rsvp' ),
 					'validation_type' => 'boolean',
 					'default'         => false,
 				],
@@ -235,10 +235,18 @@ class Settings {
 		}
 
 		$fields2 = [
-			'acr-category'               => [
+			'acr-category' => [
 				'type'            => 'dropdown',
 				'label'           => esc_html__( 'Limit to category', 'tec-labs-default-ticket-fieldset' ),
-				'tooltip'         => esc_html_x( 'You can limit adding the RSVP to events that are created in the above selected category only.', 'Setting description', 'tec-labs-default-ticket-fieldset' ),
+				'tooltip'         => esc_html_x( 'You can limit adding the RSVP to events that are created in the above selected category only.', 'Setting description', 'tec-labs-auto-create-rsvp' )
+					. ' '
+					. sprintf(
+						esc_html_x(
+							'(%1$sCreate an event category.%2$s)', 'Setting description', 'tec-labs-auto-create-rsvp'
+						),
+						'<a href="' . admin_url( 'edit-tags.php?taxonomy=tribe_events_cat&post_type=tribe_events' ) . '" target="_blank">',
+						'</a>'
+					),
 				'validation_type' => 'options',
 				'options'         => $event_categories,
 			],
@@ -307,7 +315,7 @@ class Settings {
 		$this->settings_helper->add_fields(
 			$this->prefix_settings_field_keys( $fields ),
 			'event-tickets',
-			'ticket-attendee-page-id',
+			'ticket-display-tickets-left-threshold',
 			false
 		);
 	}
