@@ -490,6 +490,39 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 * Prints and admin notice after completing the bulk action.
 	 */
 	function bulk_add_rsvp_admin_notice() {
+		$options = $this->get_all_options();
+
+		if ( 'tribe_events' == $_GET['post_type'] && $options['acr-enable'] ) {
+			// Message if limited to category.
+			if ( ! empty( $options['acr-category'] ) ) {
+				$term = get_term( $options['acr-category'] );
+				$message = '⚠️On the creation of this event an RSVP will be added automatically, if the "' . $term->name . '" category is used for the event.';
+
+				// Additional message if category will be removed.
+				if ( !empty( $options['acr-remove-category'] ) ) {
+					$message .= ' ' . 'After saving the category will be automatically removed from the event.';
+				}
+				else {
+					$message .= ' ' . 'After saving the category will NOT be removed from the event.';
+				}
+			}
+			// General message.
+			else {
+				$message = '⚠️On the creation of this event an RSVP will be added automatically.';
+			}
+
+
+			// New event
+			if ( '/wp-admin/post-new.php' == $_SERVER['DOCUMENT_URI'] ) {
+				printf(
+					'<div id="message" class="notice notice-warning"><p>' .
+					$message //__( '⚠️On the creation of this event an RSVP will be added automatically.', 'tec-labs-auto-create-rsvp' )
+					. '</p></div>',
+				);
+			}
+			// Updating event
+		}
+
 		if ( ! empty( $_REQUEST['add_rsvp'] ) ) {
 			// Get the post type object.
 			$obj = get_post_type_object( $_REQUEST['post_type'] );
