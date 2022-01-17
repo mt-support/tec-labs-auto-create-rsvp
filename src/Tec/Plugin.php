@@ -511,6 +511,12 @@ class Plugin extends \tad_DI52_ServiceProvider {
 				$message = '⚠️On the creation of this event an RSVP will be added automatically.';
 			}
 
+			$message .= ' ' . sprintf(
+				'(%1$sSettings%2$s)',
+					'<a target="_blank" href="' . admin_url( 'edit.php?post_type=tribe_events&page=tribe-common&tab=event-tickets#tec-labs-auto-create-rsvp-settings' )  . '">',
+					'</a><span class="dashicons dashicons-external"></span>'
+				);
+
 
 			// New event
 			if ( '/wp-admin/post-new.php' == $_SERVER['DOCUMENT_URI'] ) {
