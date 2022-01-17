@@ -490,37 +490,42 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 * Prints and admin notice after completing the bulk action.
 	 */
 	function bulk_add_rsvp_admin_notice() {
-		global $pagenow;
+		$screen = get_current_screen();
 		$options = $this->get_all_options();
 
-		if ( $options['acr-enable'] ) {
-			// Admin notice for new posts
-			if ( 'post-new.php' == $pagenow && 'tribe_events' == $_GET['post_type'] ) {
+		// Link to settings at the end of the message.
+		$message_options = ' ' . sprintf(
+				'(%1$sSettings%2$s)',
+				'<a target="_blank" href="' . admin_url( 'edit.php?post_type=tribe_events&page=tribe-common&tab=event-tickets#tec-labs-auto-create-rsvp-settings' ) . '">',
+				'</a><span class="dashicons dashicons-external"></span>'
+			);
 
+		if (
+			$options['acr-enable']
+			&& 'tribe_events' == $screen->post_type
+			&& 'post' == $screen->base
+		) {
+			// Admin notice for new posts
+			if ( 'add' == $screen->action ) {
 				// Message if limited to category.
 				if ( ! empty( $options['acr-category'] ) ) {
 					$term    = get_term( $options['acr-category'] );
-					$message = '⚠️On the creation of this event an RSVP will be added automatically, if the "' . $term->name . '" category is used for the event.';
+					$message = '⚠️An RSVP will be added automatically to the event on save, if the "' . $term->name . '" category is used for the event.';
 
 					// Additional message if category will be removed.
 					if ( ! empty( $options['acr-remove-category'] ) ) {
-						$message .= ' ' . 'After saving the category will be automatically removed from the event.';
+						$message .= ' ' . 'The category will be automatically removed from the event on save.';
 					} else {
-						$message .= ' ' . 'After saving the category will NOT be removed from the event.';
+						$message .= ' ' . 'The category will NOT be removed from the event on save.';
 					}
 				} // General message.
 				else {
-					$message = '⚠️On the creation of this event an RSVP will be added automatically.';
+					$message = '⚠️An RSVP will be added automatically to the event on save.';
 				}
-			}
 
+				$this->printTheAdminNotice( $message . $message_options );
 			// Admin notice on post edit / update
-			elseif (
-				'post.php' == $pagenow
-				&& 'edit' == $_GET['action']
-				&& 'tribe_events' == get_post_type( $_GET['post'] )
-			) {
-
+			} elseif ( empty( $screen->action ) ) {
 				if ( ! empty( $options['acr-enable-on-update'] ) ) {
 					// Message if limited to category.
 					if ( ! empty( $options['acr-category'] ) ) {
@@ -538,22 +543,8 @@ class Plugin extends \tad_DI52_ServiceProvider {
 					$message = '⚠️On the update of this event an RSVP will NOT be added automatically because the respective setting is not enabled.';
 				}
 
+				$this->printTheAdminNotice( $message . $message_options );
 			}
-
-			// Link to settings at the end of the message.
-			$message .= ' ' . sprintf(
-					'(%1$sSettings%2$s)',
-					'<a target="_blank" href="' . admin_url( 'edit.php?post_type=tribe_events&page=tribe-common&tab=event-tickets#tec-labs-auto-create-rsvp-settings' ) . '">',
-					'</a><span class="dashicons dashicons-external"></span>'
-				);
-
-			// Print the admin notice
-			printf(
-				'<div id="message" class="notice notice-warning"><p>' .
-				$message //__( '⚠️On the creation of this event an RSVP will be added automatically.', 'tec-labs-auto-create-rsvp' )
-				. '</p></div>',
-			);
-
 		} // if ( $options['acr-enable'] )
 
 
@@ -578,6 +569,20 @@ class Plugin extends \tad_DI52_ServiceProvider {
 				strtolower( $post_label )
 			);
 		}
+	}
+
+	/**
+	 * @param string $message
+	 *
+	 * @return void
+	 */
+	private function printTheAdminNotice( string $message ): void {
+		// Print the admin notice
+		printf(
+			'<div id="message" class="notice notice-warning"><p>' .
+			$message
+			. '</p></div>',
+		);
 	}
 
 }
