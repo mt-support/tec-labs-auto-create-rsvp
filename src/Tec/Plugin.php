@@ -368,7 +368,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 		$search = '<!-- wp:tribe/rsvp /-->';
 
 		// Do we have an RSVP block already setup? (we should)
-		if ( true === strpos( $content, $search ) ) {
+		if ( false != strpos( $content, $search ) ) {
 			return false;
 		}
 
