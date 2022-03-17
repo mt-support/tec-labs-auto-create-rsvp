@@ -45,38 +45,38 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @var string
 	 */
-	const FILE = TEC_LABS_AUTO_CREATE_RSVP_FILE;
+	const FILE = TRIBE_EXTENSION_AUTO_CREATE_RSVP_FILE;
 
 	/**
 	 * @since 1.0.0
 	 *
 	 * @var string Plugin Directory.
 	 */
-	public string $plugin_dir;
+	public $plugin_dir;
 
 	/**
 	 * @since 1.0.0
 	 *
 	 * @var string Plugin path.
 	 */
-	public string $plugin_path;
+	public $plugin_path;
 
 	/**
 	 * @since 1.0.0
 	 *
 	 * @var string Plugin URL.
 	 */
-	public string $plugin_url;
+	public $plugin_url;
 
 	/**
 	 * @since 1.0.0
 	 *
 	 * @var Settings
 	 */
-	private Settings $settings;
+	private $settings;
 
 	/**
-	 * Set up the Extension's properties.
+	 * Setup the Extension's properties.
 	 *
 	 * This always executes even if the required plugins are not present.
 	 *
@@ -118,9 +118,9 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return bool Indicates if plugin should continue initialization.
+	 * @return bool Whether the plugin dependency manifest is satisfied or not.
 	 */
-	protected function check_plugin_dependencies(): bool {
+	protected function check_plugin_dependencies() {
 		$this->register_plugin_dependencies();
 
 		return tribe_check_plugin( static::class );
@@ -148,7 +148,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 * @return string
 	 *
 	 */
-	private function get_options_prefix(): string {
+	private function get_options_prefix() {
 		return (string) str_replace( '-', '_', 'tec-labs-auto-create-rsvp' );
 	}
 
@@ -157,7 +157,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return Settings
 	 */
-	private function get_settings(): Settings {
+	private function get_settings() {
 		if ( empty( $this->settings ) ) {
 			$this->settings = new Settings( $this->get_options_prefix() );
 		}
@@ -170,7 +170,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return array
 	 */
-	public function get_all_options(): array {
+	public function get_all_options() {
 		$settings = $this->get_settings();
 
 		return $settings->get_all_options();
@@ -179,12 +179,12 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	/**
 	 * Get a specific extension option.
 	 *
-	 * @param string $option  The option name.
-	 * @param string $default The default value if the option doesn't exist.
+	 * @param        $option
+	 * @param string $default
 	 *
-	 * @return mixed Array or string.
+	 * @return array
 	 */
-	public function get_option( string $option, string $default = '' ) {
+	public function get_option( $option, $default = '' ) {
 		$settings = $this->get_settings();
 
 		return $settings->get_option( $option, $default );
@@ -195,7 +195,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 */
 	public function get_started() {
 		$enabled = $this->get_option( 'acr-enable' );
-		if ( ! empty( $enabled ) ) {
+		if ( isset( $enabled ) && ! empty( $enabled ) ) {
 			add_action( 'tribe_events_update_meta', [ $this, 'add_custom_RSVP' ], 10, 3 );
 		}
 	}
@@ -209,7 +209,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return bool
 	 */
-	public function add_custom_RSVP( int $event_id, array $data, object $event ): bool {
+	public function add_custom_RSVP( $event_id, $data, $event ) {
 		$options = $this->get_all_options();
 
 		$backend_enabled = (
@@ -292,7 +292,8 @@ class Plugin extends \tad_DI52_ServiceProvider {
 
 		// Set the name of the RSVP.
 		if (
-			empty( $options['acr-rsvp-name'] )
+			! isset ( $options['acr-rsvp-name'] )
+			|| empty( $options['acr-rsvp-name'] )
 		) {
 			$ticket_name = 'RSVP';
 		} else {
@@ -361,7 +362,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return false|int|\WP_Error
 	 */
-	public function add_rsvp_block_to_post( string $post_id ) {
+	public function add_rsvp_block_to_post( $post_id ) {
 		$content = get_the_content( null, null, $post_id );
 
 		$search = '<!-- wp:tribe/rsvp /-->';
@@ -386,7 +387,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return false|string
 	 */
-	public function format_time( string $time ) {
+	public function format_time( $time ) {
 		$time = is_numeric( $time ) ? $time : strtotime( $time );
 
 		/**
@@ -406,7 +407,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return false|string
 	 */
-	public function format_date( string $date ) {
+	public function format_date( $date ) {
 		$date = is_numeric( $date ) ? $date : strtotime( $date );
 
 		/**
@@ -424,7 +425,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return bool
 	 */
-	public function start_bulk_actions(): bool {
+	public function start_bulk_actions() {
 		$post_types = tribe_get_option( 'ticket-enabled-post-types' );
 
 		if ( empty( $post_types ) ) {
@@ -446,7 +447,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return array
 	 */
-	function bulk_add_rsvp( array $bulk_actions ): array {
+	function bulk_add_rsvp( $bulk_actions ) {
 		$bulk_actions['add_rsvp'] = sprintf(
 			__( 'Add %s', 'tec-labs-auto-create-rsvp' ),
 			tribe_get_rsvp_label_singular()
@@ -464,7 +465,7 @@ class Plugin extends \tad_DI52_ServiceProvider {
 	 *
 	 * @return string
 	 */
-	function handle_bulk_add_rsvp( string $redirect_url, string $action, array $post_ids ): string {
+	function handle_bulk_add_rsvp( $redirect_url, $action, $post_ids ) {
 		if ( $action == 'add_rsvp' ) {
 			foreach ( $post_ids as $post_id ) {
 				$event_meta = tribe_get_event_meta( $post_id, false, false );
